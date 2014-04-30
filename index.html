@@ -533,34 +533,34 @@
     </script>
   </head>
   <body>
-        <nav class="navbar navbar-default navbar-pf" role="navigation">
-            <div class="container">
-                <div class="navbar-brand">PressGang CCMS Initial Database Creator</div>
-            </div>
-        </nav>
+    <nav class="navbar navbar-default navbar-pf" role="navigation">
+      <div class="container">
+	<div class="navbar-brand">PressGang CCMS Initial Database Creator</div>
+      </div>
+    </nav>
         
-        <div class="container-fluid" ng-controller="QNAController">
-	  <div class="container step-container-main" >
-	    <div class="form-group">
-	      <label for="topics">Manually Included Topics</label>
-	      <input class="form-control" type="text" id="topics"></input>
-	    </div>
-	    <div class="form-group">
-	      <label for="specs">Manually Included Specs</label>
-	      <input class="form-control" type="text" id="specs"></input>
-	    </div>
-	    <div class="form-group">
-	      <label for="entities">entities.properties</label>
-	      <textarea class="form-control" style="width: 100%" rows="20" id="entities"></textarea>
-	    </div>
-	    <div class="form-group">
-	      <label for="output">SQL Generation Script</div>
-	      <textarea class="form-control" style="width: 100%" rows="20" id="output"></textarea>		  
-	    </div>
-	    <div class="form-group">
-	      <input type="button" onclick="generateSQL()" value="Generate SQL"></input>
-	    </div>
-	  </div>
-	<div>
+    <div class="container-fluid" ng-controller="QNAController">
+      <div class="container step-container-main" >
+	<div class="form-group">
+	  <label for="topics">Manually Included Topics</label>
+	  <input class="form-control" type="text" id="topics"></input>
+	</div>
+	<div class="form-group">
+	  <label for="specs">Manually Included Specs</label>
+	  <input class="form-control" type="text" id="specs"></input>
+	</div>
+	<div class="form-group">
+	  <label for="entities">entities.properties</label>
+	  <textarea class="form-control" style="width: 100%" rows="20" id="entities"></textarea>
+	</div>
+	<div class="form-group">
+	  <label for="output">SQL Generation Script</label>
+	  <textarea class="form-control" style="width: 100%" rows="20" id="output"></textarea>		  
+	</div>
+	<div class="form-group">
+	  <input class="btn btn-default" type="button" onclick="generateSQL()" value="Generate SQL"></input>
+	</div>
+      </div>
+    <div>
   </body>
 </html>
