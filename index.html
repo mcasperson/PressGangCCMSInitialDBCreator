@@ -1,0 +1,566 @@
+<html>
+  <head>
+    <link href="css/patternfly.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="js/patternfly.js"></script>
+    
+    <script>
+      function generateSQL() {
+	var CS_NODE_TOPIC = 0;
+	var CS_NODE_INITIAL_CONTENT_TOPIC = 9;
+	var CS_NODE_META_DATA_TOPIC = 10;
+	var CS_NODE_FILE = 11;
+	
+	var tagRE = /^tag\./;
+	var categoryRE = /^category\./;
+	var blobRE = /^constant\.blob\./;
+	var stringRE = /^constant\.string\./;
+	var propertyTagRE = /^propertyTag\./;
+	var usersRE = /^user\./;
+	
+	var username = "root";
+	var password = "topicrepo112";
+	var entities = jQuery("#entities").val().split("\n");
+	
+	var output = "mysqldump -d -h localhost -u " + username + " -p" + password + " Skynet > /tmp/dumpfile.sql\n";
+	output += "echo \"DROP DATABASE SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
+	output += "echo \"CREATE SCHEMA SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
+	output += "mysql -h localhost -u " + username + " -p" + password + " -DSkynetClean < /tmp/dumpfile.sql\n";
+	output += "echo \"# PressGang initial database population\" > /tmp/create.sql\n";
+		
+	output += "echo \"# Reseting the auto increment values means we can insert new IDs below where the autoincrement value was originall set.\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE REVINFO AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE BlobConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE BlobConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE BugzillaBug AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE BugzillaBug_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToCSNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToCSNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Category AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Category_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpec AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecInfoNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecInfoNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToProcess AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ContentSpec_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE File AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE File_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Filter AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterField AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterField_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterLocale AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterLocale_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterOption AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterOption_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE FilterTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Filter_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ImageFile AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE ImageFile_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE IntegerConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE IntegerConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE LanguageFile AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE LanguageFile_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE LanguageImage AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE LanguageImage_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE MinHash AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE MinHashXOR AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE MinHashXOR_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE MinHash_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Process AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Project AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Project_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE PropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RelationshipTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RelationshipTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Role AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RoleToRole AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RoleToRoleRelationship AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RoleToRoleRelationship_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE RoleToRole_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Role_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE StringConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE StringConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Tag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagExclusion AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagExclusion_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToProject AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToProject_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToTagRelationship AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToTagRelationship_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TagToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Tag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Topic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicSourceURL AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicSourceURL_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToBugzillaBug AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToBugzillaBug_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSourceURL AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSourceURL_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE Topic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNodeString AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNodeString_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedContentSpec AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedContentSpec_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicData_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicString AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicString_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE User AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE UserRole AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE UserRole_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	output += "echo \"ALTER TABLE User_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+	
+	output += "echo \"\" >> /tmp/create.sql\n";
+	output += "echo \"# Create an initial revision\" >> /tmp/create.sql\n";
+	output += "echo \"INSERT INTO SkynetClean.REVINFO\" >> /tmp/create.sql\n";
+	output += "echo \"(REV,REVTSTMP,Flag,Message,UserName)\" >> /tmp/create.sql\n";
+	output += "echo \"VALUES\" >> /tmp/create.sql\n";
+	output += "echo \"(0,1388534400000,null,'Initial Database Creation',null);\" >> /tmp/create.sql\n";
+	
+	output += "echo \"\" >> /tmp/create.sql\n";
+	output += "echo \"#Include all LiquidBase updates so they are not run again\" >> /tmp/create.sql\n";
+	output += "echo \"INSERT INTO SkynetClean.DATABASECHANGELOG\" >> /tmp/create.sql\n";
+	output += "echo \"(ID,AUTHOR,FILENAME,DATEEXECUTED,ORDEREXECUTED,EXECTYPE,MD5SUM,DESCRIPTION,COMMENTS,TAG,LIQUIBASE)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT ID,AUTHOR,FILENAME,DATEEXECUTED,ORDEREXECUTED,EXECTYPE,MD5SUM,DESCRIPTION,COMMENTS,TAG,LIQUIBASE FROM Skynet.DATABASECHANGELOG);\" >> /tmp/create.sql\n";
+	output += "echo \"\" >> /tmp/create.sql\n";
+	
+	output += "echo \"\" >> /tmp/create.sql\n";
+	output += "echo \"# Include the MinHash XOR values\" >> /tmp/create.sql\n";	
+	output += "echo \"INSERT INTO SkynetClean.MinHashXOR\" >> /tmp/create.sql\n";
+	output += "echo \"(MinHashXORID,MinHashXOR,MinHashXORFuncID)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT MinHashXORID,MinHashXOR,MinHashXORFuncID FROM Skynet.MinHashXOR);\" >> /tmp/create.sql\n";
+	
+	output += "echo \"INSERT INTO SkynetClean.MinHashXOR_AUD\" >> /tmp/create.sql\n";
+	output += "echo \"(MinHashXORID,MinHashXORFuncID,REV,REVTYPE,REVEND,MinHashXOR)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT MinHashXORID,MinHashXORFuncID,1,0,null,MinHashXOR FROM Skynet.MinHashXOR);\" >> /tmp/create.sql\n";
+	
+	_.each(entities, function(element, index, list) {
+	  var keyValue = element.split(/\s*=\s*/);
+		  
+	  if (tagRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.Tag\" >> /tmp/create.sql\n";
+	    output += "echo \"(TagID, TagName, TagDescription)\" >> /tmp/create.sql\n";
+	    output += "echo \"(SELECT TagID, TagName, TagDescription FROM Skynet.Tag WHERE TagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+	    
+	    output += "echo \"INSERT INTO SkynetClean.Tag_AUD\" >> /tmp/create.sql\n";
+	    output += "echo \"(TagID, REV, REVEND, REVTYPE, TagDescription, TagName)\" >> /tmp/create.sql\n";
+	    output += "echo \"(SELECT TagID, 1, null, 0, TagName, TagDescription FROM Skynet.Tag WHERE TagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+	    
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  } else if (categoryRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.Category\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(CategoryID, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT CategoryID, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive FROM Skynet.Category WHERE CategoryID = " + keyValue[1] + ");\" >> /tmp/create.sql\n"; 
+
+	    output += "echo \"INSERT INTO SkynetClean.Category_AUD\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(CategoryID,REV,REVEND,REVTYPE,CategoryDescription,CategoryName,CategorySort,MutuallyExclusive)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT CategoryID,1,null,0,CategoryDescription,CategoryName,CategorySort,MutuallyExclusive FROM SkynetClean.Category WHERE CategoryID = " + keyValue[1] + ");\" >> /tmp/create.sql\n"; 
+
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  } else if (blobRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.BlobConstants\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(BlobConstantsID,ConstantName,ConstantValue)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT BlobConstantsID,ConstantName,ConstantValue FROM Skynet.BlobConstants WHERE BlobConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n"; 
+
+	    output += "echo \"INSERT INTO SkynetClean.BlobConstants_AUD\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(BlobConstantsID,REV,REVEND,REVTYPE,ConstantName,ConstantValue)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT BlobConstantsID,1,null,0,ConstantName,ConstantValue FROM Skynet.BlobConstants WHERE BlobConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+	    
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  } else if (stringRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.StringConstants\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(StringConstantsID,ConstantName,ConstantValue)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT StringConstantsID,ConstantName,ConstantValue FROM Skynet.StringConstants WHERE StringConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n"; 
+
+	    output += "echo \"INSERT INTO SkynetClean.StringConstants_AUD\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(StringConstantsID,REV,REVEND,REVTYPE,ConstantName,ConstantValue)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT StringConstantsID,1,null,0,ConstantName,ConstantValue FROM Skynet.StringConstants WHERE StringConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n"; 
+	    
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  } else if (propertyTagRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.PropertyTag\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(PropertyTagID,PropertyTagName,PropertyTagDescription,PropertyTagRegex,PropertyTagCanBeNull,PropertyTagIsUnique)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT PropertyTagID,PropertyTagName,PropertyTagDescription,PropertyTagRegex,PropertyTagCanBeNull,PropertyTagIsUnique FROM Skynet.PropertyTag WHERE PropertyTagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+
+	    output += "echo \"INSERT INTO SkynetClean.PropertyTag_AUD\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(PropertyTagID,REV,REVEND,REVTYPE,PropertyTagCanBeNull,PropertyTagDescription,PropertyTagName,PropertyTagRegex,PropertyTagIsUnique)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT PropertyTagID,1,null,0,PropertyTagCanBeNull,PropertyTagDescription,PropertyTagName,PropertyTagRegex,PropertyTagIsUnique FROM Skynet.PropertyTag WHERE PropertyTagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";	
+	    
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  } else if (usersRE.test(element)) {
+	    output += "echo \"INSERT INTO SkynetClean.User\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(UserID,UserName,Description)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT UserID,UserName,Description FROM Skynet.User WHERE UserID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+
+	    output += "echo \"INSERT INTO SkynetClean.User_AUD\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(UserID,REV,REVEND,REVTYPE,Description,UserName)\" >> /tmp/create.sql\n" ;
+	    output += "echo \"(SELECT UserID,1,null,0,Description,UserName FROM Skynet.User_AUD WHERE UserID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
+	    
+	    output += "echo \"\" >> /tmp/create.sql\n";
+	  }
+	});
+	
+	// Add some topics to the initial database
+	var topics = jQuery("#topics").val().split(",");
+	_.each(topics, function(element, index, list) {
+	  output += "echo \"INSERT INTO SkynetClean.Topic\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(TopicID,TopicTitle,TopicText,TopicTimeStamp,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash)\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(SELECT TopicID,TopicTitle,TopicText,TopicTimeStamp,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash FROM Skynet.Topic WHERE TopicID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.Topic_AUD\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(TopicID,REV,REVEND,REVTYPE,TopicText,TopicTimeStamp,TopicTitle,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash)\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(SELECT TopicID,1,null,0,TopicText,TopicTimeStamp,TopicTitle,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash FROM Skynet.Topic WHERE TopicID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"\" >> /tmp/create.sql\n";	  
+	  output += "echo \"# Include the MinHash values\" >> /tmp/create.sql\n";
+	  output += "echo \"INSERT INTO SkynetClean.MinHash\" >> /tmp/create.sql\n";
+	  output += "echo \"(MinHashID,MinHashFuncID,TopicID,MinHash)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT MinHashID,MinHashFuncID,TopicID,MinHash FROM Skynet.MinHash WHERE TopicID = " + element + ");\" >> /tmp/create.sql\n";
+	    
+	  output += "echo \"INSERT INTO SkynetClean.MinHash_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(MinHashID,REV,REVTYPE,REVEND,MinHashFuncID,TopicID,MinHash)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT MinHashID,1,0,null,MinHashFuncID,TopicID,MinHash FROM Skynet.MinHash WHERE TopicID = " + element + ");\" >> /tmp/create.sql\n";
+	});
+	
+	// Add some content spec
+	var specs = jQuery("#specs").val().split(",");
+	_.each(specs, function(element, index, list) {
+	  // Content specs
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpec\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecID,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecID,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec FROM Skynet.ContentSpec WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpec_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecID,REV,REVTYPE,REVEND,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecID,1,0,null,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec FROM Skynet.ContentSpec WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  // CS Nodes. Note that we don't used fixed revisions
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecNode\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecNodeID,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,EntityRevision,ContentSpecID,ParentID,NextNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecNodeID,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,null,ContentSpecID,ParentID,NextNodeID FROM Skynet.ContentSpecNode WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecNode_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecNodeID,REV,REVTYPE,REVEND,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,EntityRevision,ContentSpecID,ParentID,NextNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecNodeID,1,0,null,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,null,ContentSpecID,ParentID,NextNodeID FROM Skynet.ContentSpecNode WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  // Spec to property tag
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecToPropertyTagID,ContentSpecID,PropertyTagID,Value)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecToPropertyTagID,ContentSpecID,PropertyTagID,Value FROM Skynet.ContentSpecToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE ContentSpecID = " + element + "\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.PropertyTag WHERE PropertyTagID = ContentSpecToPropertyTag.PropertyTagID));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecToPropertyTag_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecToPropertyTagID,REV,REVTYPE,REVEND,ContentSpecID,PropertyTagID,Value)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecToPropertyTagID,1,0,null,ContentSpecID,PropertyTagID,Value FROM Skynet.ContentSpecToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE ContentSpecID = " + element + "\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.PropertyTag WHERE PropertyTagID = ContentSpecToPropertyTag.PropertyTagID));\" >> /tmp/create.sql\n";
+	  
+	  // Spec to Tag
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecToTag\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecToTagID,ContentSpecID,TagID,BookTag)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecToTagID,ContentSpecID,TagID,BookTag FROM Skynet.ContentSpecToTag WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n"; 
+	  
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecToTag_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecToTagID,REV,REVTYPE,REVEND,ContentSpecID,TagID,BookTag)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecToTagID,1,0,null,ContentSpecID,TagID,BookTag FROM Skynet.ContentSpecToTag WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  // CS Node to node
+	  output += "echo \"INSERT INTO SkynetClean.CSNodeToCSNode\" >> /tmp/create.sql\n";
+	  output += "echo \"(CSNodeToCSNodeID,MainNodeID,RelatedNodeID,RelationshipType,RelationshipMode,Sort)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT CSNodeToCSNodeID,MainNodeID,RelatedNodeID,RelationshipType,RelationshipMode,Sort FROM Skynet.CSNodeToCSNode \" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNodeID = CSNodeToCSNode.MainNodeID\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNodeID = CSNodeToCSNode.RelatedNodeID)));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.CSNodeToCSNode_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(CSNodeToCSNodeID,REV,REVTYPE,REVEND,MainNodeID,RelatedNodeID,RelationshipType,RelationshipMode,Sort)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT CSNodeToCSNodeID,1,0,null,MainNodeID,RelatedNodeID,RelationshipType,RelationshipMode,Sort FROM Skynet.CSNodeToCSNode \" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = CSNodeToCSNode.MainNodeID\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = CSNodeToCSNode.RelatedNodeID)));\" >> /tmp/create.sql\n";
+	  
+	  // CS Node to property tag
+	  output += "echo \"INSERT INTO SkynetClean.CSNodeToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"(CSNodeToPropertyTagID,CSNodeID,PropertyTagID,Value)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT CSNodeToPropertyTagID,CSNodeID,PropertyTagID,Value FROM Skynet.CSNodeToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = CSNodeToPropertyTag.CSNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.PropertyTag WHERE PropertyTag.PropertyTagID = CSNodeToPropertyTag.PropertyTagID));\" >> /tmp/create.sql\n";
+
+	  output += "echo \"INSERT INTO SkynetClean.CSNodeToPropertyTag_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(CSNodeToPropertyTagID,REV,REVTYPE,REVEND,CSNodeID,PropertyTagID,Value)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT CSNodeToPropertyTagID,1,0,null,CSNodeID,PropertyTagID,Value FROM Skynet.CSNodeToPropertyTag\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = CSNodeToPropertyTag.CSNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"AND EXISTS (SELECT * FROM SkynetClean.PropertyTag WHERE PropertyTag.PropertyTagID = CSNodeToPropertyTag.PropertyTagID));\" >> /tmp/create.sql\n";
+	  
+	  // Spec info node. Note that we references all topics without a specific revision
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecInfoNode\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecInfoNodeID,TopicID,TopicRevision,InfoCondition,ContentSpecNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecInfoNodeID,TopicID,null,InfoCondition,ContentSpecNodeID FROM Skynet.ContentSpecInfoNode\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = ContentSpecInfoNode.ContentSpecNodeID));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.ContentSpecInfoNode_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(ContentSpecInfoNodeID,REV,REVTYPE,REVEND,TopicID,TopicRevision,InfoCondition,ContentSpecNodeID)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecInfoNodeID,1,0,null,TopicID,null,InfoCondition,ContentSpecNodeID FROM Skynet.ContentSpecInfoNode\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ContentSpecNode WHERE ContentSpecNode.ContentSpecNodeID = ContentSpecInfoNode.ContentSpecNodeID));\" >> /tmp/create.sql\n";
+	  
+	  // All the topics referenced by cs nodes and info nodes
+	  output += "echo \"INSERT INTO SkynetClean.Topic\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(TopicID,TopicTitle,TopicText,TopicTimeStamp,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash)\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(SELECT TopicID,TopicTitle,TopicText,TopicTimeStamp,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash FROM Skynet.Topic \" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE TopicID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType IN (" + CS_NODE_TOPIC + "," + CS_NODE_INITIAL_CONTENT_TOPIC + "," + CS_NODE_META_DATA_TOPIC + ")) OR TopicID IN (SELECT TopicID FROM SkynetClean.ContentSpecInfoNode));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.Topic_AUD\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(TopicID,REV,REVEND,REVTYPE,TopicText,TopicTimeStamp,TopicTitle,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash)\" >> /tmp/create.sql\n" ;
+	  output += "echo \"(SELECT TopicID,1,null,0,TopicText,TopicTimeStamp,TopicTitle,TopicXML,TopicLocale,TopicXMLFormat,TopicContentHash FROM Skynet.Topic\" >> /tmp/create.sql\n" ;
+	  output += "echo \"WHERE TopicID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType IN (" + CS_NODE_TOPIC + "," + CS_NODE_INITIAL_CONTENT_TOPIC + "," + CS_NODE_META_DATA_TOPIC + ")) OR TopicID IN (SELECT TopicID FROM SkynetClean.ContentSpecInfoNode));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"\" >> /tmp/create.sql\n";	  
+	  output += "echo \"# Include the MinHash values\" >> /tmp/create.sql\n";
+	  output += "echo \"INSERT INTO SkynetClean.MinHash\" >> /tmp/create.sql\n";
+	  output += "echo \"(MinHashID,MinHashFuncID,TopicID,MinHash)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT MinHashID,MinHashFuncID,TopicID,MinHash FROM Skynet.MinHash\" >> /tmp/create.sql\n" ; 
+	  output += "echo \"WHERE TopicID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType IN (" + CS_NODE_TOPIC + "," + CS_NODE_INITIAL_CONTENT_TOPIC + "," + CS_NODE_META_DATA_TOPIC + ")) OR TopicID IN (SELECT TopicID FROM SkynetClean.ContentSpecInfoNode));\" >> /tmp/create.sql\n";
+	    
+	  output += "echo \"INSERT INTO SkynetClean.MinHash_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(MinHashID,REV,REVTYPE,REVEND,MinHashFuncID,TopicID,MinHash)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT MinHashID,1,0,null,MinHashFuncID,TopicID,MinHash FROM Skynet.MinHash\" >> /tmp/create.sql\n" ; 
+	  output += "echo \"WHERE TopicID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType IN (" + CS_NODE_TOPIC + "," + CS_NODE_INITIAL_CONTENT_TOPIC + "," + CS_NODE_META_DATA_TOPIC + ")) OR TopicID IN (SELECT TopicID FROM SkynetClean.ContentSpecInfoNode));\" >> /tmp/create.sql\n";
+	  
+	  // All the files referenced by cs nodes
+	  output += "echo \"INSERT INTO SkynetClean.File\" >> /tmp/create.sql\n";
+	  output += "echo \"(FileID,FileName,FilePath,Description,ExplodeArchive)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT FileID,FileName,FilePath,Description,ExplodeArchive FROM Skynet.File\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE FileID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType = " + CS_NODE_FILE + "));\" >> /tmp/create.sql\n";
+	  
+	  output += "echo \"INSERT INTO SkynetClean.File_AUD\" >> /tmp/create.sql\n";
+	  output += "echo \"(FileID,REV,REVTYPE,REVEND,FileName,FilePath,Description,ExplodeArchive)\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT FileID,1,0,null,FileName,FilePath,Description,ExplodeArchive FROM Skynet.File\" >> /tmp/create.sql\n";
+	  output += "echo \"WHERE FileID IN (SELECT EntityID FROM SkynetClean.ContentSpecNode WHERE NodeType = " + CS_NODE_FILE + "));\" >> /tmp/create.sql\n";	  	  	  
+	});
+	
+	// Upload any images referenced in the topics
+	output += "echo \"INSERT INTO SkynetClean.ImageFile\" >> /tmp/create.sql\n";
+	output += "echo \"(ImageFileID,Description)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT ImageFileID,Description FROM Skynet.ImageFile\" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.Topic WHERE TopicXML LIKE CONCAT ('%images/', ImageFile.ImageFileID, '%')));\" >> /tmp/create.sql\n";
+	
+	output += "echo \"INSERT INTO SkynetClean.ImageFile_AUD\" >> /tmp/create.sql\n";
+	output += "echo \"(ImageFileID,REV,REVEND,REVTYPE,Description)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT ImageFileID,1,null,0,Description FROM Skynet.ImageFile\" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.Topic WHERE TopicXML LIKE CONCAT ('%images/', ImageFile.ImageFileID, '%')));\" >> /tmp/create.sql\n";
+	
+	output += "echo \"INSERT INTO SkynetClean.LanguageImage\" >> /tmp/create.sql\n";
+	output += "echo \"(LanguageImageID,ImageFileID,ThumbnailData,Locale,OriginalFileName,ImageData,ImageContentHash)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT LanguageImageID,ImageFileID,ThumbnailData,Locale,OriginalFileName,ImageData,ImageContentHash FROM Skynet.LanguageImage \" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ImageFile WHERE ImageFile.ImageFileID = LanguageImage.ImageFileID));\" >> /tmp/create.sql\n";
+	
+	output += "echo \"INSERT INTO Skynet.LanguageImage_AUD\" >> /tmp/create.sql\n";
+	output += "echo \"(LanguageImageID,REV,REVTYPE,REVEND,ImageData,Locale,OriginalFileName,ThumbnailData,ImageFileID,ImageContentHash)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT LanguageImageID,1,0,null,ImageData,Locale,OriginalFileName,ThumbnailData,ImageFileID,ImageContentHash FROM Skynet.LanguageImage \" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ImageFile WHERE ImageFile.ImageFileID = LanguageImage.ImageFileID));\" >> /tmp/create.sql\n";
+	
+	// Add the mapping between tag and category
+	output += "echo \"INSERT INTO SkynetClean.TagToCategory\" >> /tmp/create.sql\n";
+	output += "echo \"(TagToCategoryID,TagID,CategoryID,Sorting)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT TagToCategoryID,TagID,CategoryID,Sorting FROM Skynet.TagToCategory\" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS(SELECT * FROM SkynetClean.Tag WHERE Tag.TagID = TagToCategory.TagID)\" >> /tmp/create.sql\n";
+	output += "echo \"AND EXISTS(SELECT * FROM SkynetClean.Category WHERE Category.CategoryID = TagToCategory.CategoryID));\" >> /tmp/create.sql\n";
+	
+	output += "echo \"INSERT INTO SkynetClean.TagToCategory_AUD\" >> /tmp/create.sql\n";
+	output += "echo \"(TagToCategoryID,REV,REVEND,REVTYPE,Sorting,CategoryID,TagID)\" >> /tmp/create.sql\n";
+	output += "echo \"(SELECT TagToCategoryID,1,null,0,Sorting,CategoryID,TagID FROM Skynet.TagToCategory\" >> /tmp/create.sql\n";
+	output += "echo \"WHERE EXISTS(SELECT * FROM SkynetClean.Tag WHERE Tag.TagID = TagToCategory.TagID)\" >> /tmp/create.sql\n";
+	output += "echo \"AND EXISTS(SELECT * FROM SkynetClean.Category WHERE Category.CategoryID = TagToCategory.CategoryID));\" >> /tmp/create.sql\n";	
+	
+	// Commands to create the clean database and to dump it to a new sql file
+	output += "mysql -h localhost -u root -ptopicrepo112 -DSkynetClean < /tmp/create.sql\n";
+	output += "mysqldump -h localhost -u " + username + " -p" + password + " SkynetClean > /tmp/initialdb.sql\n";
+	
+	// These commands ensure that any new entries created in the database have large ids. This means we can dump initial content
+	// with their original ids
+	output += "echo \"ALTER TABLE BlobConstants AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE BlobConstants_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE BugzillaBug AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE BugzillaBug_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToCSNode AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToCSNode_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToPropertyTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE CSNodeToPropertyTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Category AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Category_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpec AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecInfoNode AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecInfoNode_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecNode AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecNode_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToProcess AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToPropertyTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToPropertyTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpecToTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ContentSpec_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE File AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE File_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Filter AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterCategory AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterCategory_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterField AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterField_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterLocale AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterLocale_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterOption AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterOption_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE FilterTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Filter_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ImageFile AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE ImageFile_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE IntegerConstants AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE IntegerConstants_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE LanguageFile AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE LanguageFile_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE LanguageImage AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE LanguageImage_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE MinHash AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE MinHashXOR AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE MinHashXOR_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE MinHash_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Process AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Project AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Project_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagCategory AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagCategory_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE PropertyTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RelationshipTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RelationshipTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Role AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RoleToRole AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RoleToRoleRelationship AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RoleToRoleRelationship_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE RoleToRole_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Role_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE StringConstants AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE StringConstants_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Tag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagExclusion AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagExclusion_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToCategory AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToCategory_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToProject AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToProject_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToPropertyTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToPropertyTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToTagRelationship AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToTagRelationship_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TagToTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Tag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Topic AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicSecondOrderData AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicSourceURL AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicSourceURL_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToBugzillaBug AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToBugzillaBug_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToPropertyTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToPropertyTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTag AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTag_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopic AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSecondOrderData AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSourceURL AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopicSourceURL_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TopicToTopic_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE Topic_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNode AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNodeString AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNodeString_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedCSNode_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedContentSpec AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedContentSpec_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopic AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicData AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicData_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicString AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopicString_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE TranslatedTopic_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE User AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE UserRole AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE UserRole_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+	output += "echo \"ALTER TABLE User_AUD AUTO_INCREMENT = 1000000;\" >> /tmp/initialdb.sql\n";
+
+	jQuery("#output").val(output);
+      }
+    </script>
+  </head>
+  <body>
+        <nav class="navbar navbar-default navbar-pf" role="navigation">
+            <div class="container">
+                <div class="navbar-brand">PressGang CCMS Initial Database Creator</div>
+            </div>
+        </nav>
+        
+        <div class="container-fluid" ng-controller="QNAController">
+	  <div class="container step-container-main" >
+	    <div class="form-group">
+	      <label for="topics">Manually Included Topics</label>
+	      <input class="form-control" type="text" id="topics"></input>
+	    </div>
+	    <div class="form-group">
+	      <label for="specs">Manually Included Specs</label>
+	      <input class="form-control" type="text" id="specs"></input>
+	    </div>
+	    <div class="form-group">
+	      <label for="entities">entities.properties</label>
+	      <textarea class="form-control" style="width: 100%" rows="20" id="entities"></textarea>
+	    </div>
+	    <div class="form-group">
+	      <label for="output">SQL Generation Script</div>
+	      <textarea class="form-control" style="width: 100%" rows="20" id="output"></textarea>		  
+	    </div>
+	    <div class="form-group">
+	      <input type="button" onclick="generateSQL()" value="Generate SQL"></input>
+	    </div>
+	  </div>
+	<div>
+  </body>
+</html>
