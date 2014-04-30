@@ -542,24 +542,24 @@
     <div class="container-fluid" ng-controller="QNAController">
       <div class="container step-container-main" >
 	<div class="form-group">
-	  <label for="topics">Manually Included Topics</label>
+	  <label for="topics">List any topics that should be included in the initial database as a comma seperated list of ids</label>
 	  <input class="form-control" type="text" id="topics"></input>
 	</div>
 	<div class="form-group">
-	  <label for="specs">Manually Included Specs</label>
+	  <label for="specs">List any specs that should be included in the initial database as a comma seperated list of ids</label>
 	  <input class="form-control" type="text" id="specs"></input>
 	</div>
 	<div class="form-group">
-	  <label for="entities">entities.properties</label>
-	  <textarea class="form-control" style="width: 100%" rows="20" id="entities"></textarea>
-	</div>
-	<div class="form-group">
-	  <label for="output">SQL Generation Script</label>
-	  <textarea class="form-control" style="width: 100%" rows="20" id="output"></textarea>		  
+	  <label for="entities">Copy the contents of entities.properties here</label>
+	  <textarea class="form-control" style="width: 100%" rows="10" id="entities"></textarea>
 	</div>
 	<div class="form-group">
 	  <input class="btn btn-default" type="button" onclick="generateSQL()" value="Generate SQL"></input>
 	</div>
+	<div class="form-group">
+	  <label for="output">This script can be run on a system that has a production database to generate a clean initial database</label>
+	  <textarea readonly class="form-control" style="width: 100%" rows="10" id="output"></textarea>		  
+	</div>	
       </div>
     <div>
   </body>
