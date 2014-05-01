@@ -27,7 +27,7 @@
 	var usersRE = /^user\./;
 	
 	var username = "root";
-	var password = "topicrepo112";
+	var password = jQuery("#password").val();
 	var entities = jQuery("#entities").val().split("\n");
 	
 	var output = "mysqldump -d -h localhost -u " + username + " -p" + password + " Skynet > /tmp/dumpfile.sql\n";
@@ -423,7 +423,7 @@
 	output += "echo \"AND EXISTS(SELECT * FROM SkynetClean.Category WHERE Category.CategoryID = TagToCategory.CategoryID));\" >> /tmp/create.sql\n";	
 	
 	// Commands to create the clean database and to dump it to a new sql file
-	output += "mysql -h localhost -u root -ptopicrepo112 -DSkynetClean < /tmp/create.sql\n";
+	output += "mysql -h localhost -u root -p" + password + " -DSkynetClean < /tmp/create.sql\n";
 	output += "mysqldump -h localhost -u " + username + " -p" + password + " SkynetClean > /tmp/initialdb.sql\n";
 	
 	// These commands ensure that any new entries created in the database have large ids. This means we can dump initial content
@@ -556,6 +556,10 @@
         
     <div class="container-fluid" ng-controller="QNAController">
       <div class="container step-container-main" >
+	<div class="form-group">
+	  <label for="topics">Database password</label>
+	  <input class="form-control" type="text" id="password"></input>
+	</div>
 	<div class="form-group">
 	  <label for="topics">List any topics that should be included in the initial database as a comma seperated list of ids</label>
 	  <input class="form-control" type="text" id="topics"></input>
