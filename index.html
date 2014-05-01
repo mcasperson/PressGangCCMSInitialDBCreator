@@ -275,10 +275,18 @@
 	  output += "echo \"(ContentSpecID,REV,REVTYPE,REVEND,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec)\" >> /tmp/create.sql\n";
 	  output += "echo \"(SELECT ContentSpecID,1,0,null,ContentSpecType,LastPublished,LastModified,Locale,GlobalCondition,Errors,FailedSpec FROM Skynet.ContentSpec WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
 	  
-	  // CS Nodes. Note that we don't used fixed revisions
+	  // CS Nodes. Note that we don't used fixed revisions for the entities.
+	  // Also note that nextnode is null. We do this so all the nodes can be added before we start adding links to
+	  // others that are not yet added. MySQL can disable reference checking for this kind of import, but since this
+	  // is the only case where we need to deal with references to not yet added rows, the benefit of reference checking
+	  // outweighs the overhead of a two step add/update.
 	  output += "echo \"INSERT INTO SkynetClean.ContentSpecNode\" >> /tmp/create.sql\n";
 	  output += "echo \"(ContentSpecNodeID,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,EntityRevision,ContentSpecID,ParentID,NextNodeID)\" >> /tmp/create.sql\n";
-	  output += "echo \"(SELECT ContentSpecNodeID,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,null,ContentSpecID,ParentID,NextNodeID FROM Skynet.ContentSpecNode WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  output += "echo \"(SELECT ContentSpecNodeID,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,null,ContentSpecID,ParentID,null FROM Skynet.ContentSpecNode WHERE ContentSpecID = " + element + ");\" >> /tmp/create.sql\n";
+	  
+	  // Now the node cs nodes are added, set up next node
+	  output += "echo \"UPDATE SkynetClean.ContentSpecNode as clean\" >> /tmp/create.sql\n";
+	  output += "echo \"SET NextNodeID = (SELECT NextNodeID FROM Skynet.ContentSpecNode as original WHERE original.ContentSpecNodeID = clean.ContentSpecNodeID);\" >> /tmp/create.sql\n";
 	  
 	  output += "echo \"INSERT INTO SkynetClean.ContentSpecNode_AUD\" >> /tmp/create.sql\n";
 	  output += "echo \"(ContentSpecNodeID,REV,REVTYPE,REVEND,NodeTitle,NodeTargetID,NodeType,NodeCondition,AdditionalText,EntityID,EntityRevision,ContentSpecID,ParentID,NextNodeID)\" >> /tmp/create.sql\n";
@@ -394,7 +402,7 @@
 	output += "echo \"(SELECT LanguageImageID,ImageFileID,ThumbnailData,Locale,OriginalFileName,ImageData,ImageContentHash FROM Skynet.LanguageImage \" >> /tmp/create.sql\n";
 	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ImageFile WHERE ImageFile.ImageFileID = LanguageImage.ImageFileID));\" >> /tmp/create.sql\n";
 	
-	output += "echo \"INSERT INTO Skynet.LanguageImage_AUD\" >> /tmp/create.sql\n";
+	output += "echo \"INSERT INTO SkynetClean.LanguageImage_AUD\" >> /tmp/create.sql\n";
 	output += "echo \"(LanguageImageID,REV,REVTYPE,REVEND,ImageData,Locale,OriginalFileName,ThumbnailData,ImageFileID,ImageContentHash)\" >> /tmp/create.sql\n";
 	output += "echo \"(SELECT LanguageImageID,1,0,null,ImageData,Locale,OriginalFileName,ThumbnailData,ImageFileID,ImageContentHash FROM Skynet.LanguageImage \" >> /tmp/create.sql\n";
 	output += "echo \"WHERE EXISTS (SELECT * FROM SkynetClean.ImageFile WHERE ImageFile.ImageFileID = LanguageImage.ImageFileID));\" >> /tmp/create.sql\n";
