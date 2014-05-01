@@ -556,29 +556,31 @@
         
     <div class="container-fluid" ng-controller="QNAController">
       <div class="container step-container-main" >
-	<div class="form-group">
-	  <label for="topics">Database password</label>
-	  <input class="form-control" type="text" id="password"></input>
+	<form role="form">
+	  <div class="form-group">
+	    <label for="topics">Enter the root password for the database that the initial data will be extracted from</label>
+	    <input class="form-control" type="text" id="password"></input>
+	  </div>
+	  <div class="form-group">
+	    <label for="topics">List any topics that should be included in the initial database as a comma seperated list of ids</label>
+	    <input class="form-control" type="text" id="topics"></input>
+	  </div>
+	  <div class="form-group">
+	    <label for="specs">List any specs that should be included in the initial database as a comma seperated list of ids</label>
+	    <input class="form-control" type="text" id="specs"></input>
+	  </div>
+	  <div class="form-group">
+	    <label for="entities">Copy the contents of entities.properties here</label>
+	    <textarea class="form-control" style="width: 100%" rows="10" id="entities"></textarea>
+	  </div>
+	  <div class="form-group">
+	    <input class="btn btn-default" type="button" onclick="generateSQL()" value="Generate Script"></input>
+	  </div>
+	  <div class="form-group">
+	    <label for="output">This script can be run on a system that has a production database to generate a clean initial database</label>
+	    <textarea readonly class="form-control" style="width: 100%" rows="10" id="output"></textarea>		  
+	  </div>	
 	</div>
-	<div class="form-group">
-	  <label for="topics">List any topics that should be included in the initial database as a comma seperated list of ids</label>
-	  <input class="form-control" type="text" id="topics"></input>
-	</div>
-	<div class="form-group">
-	  <label for="specs">List any specs that should be included in the initial database as a comma seperated list of ids</label>
-	  <input class="form-control" type="text" id="specs"></input>
-	</div>
-	<div class="form-group">
-	  <label for="entities">Copy the contents of entities.properties here</label>
-	  <textarea class="form-control" style="width: 100%" rows="10" id="entities"></textarea>
-	</div>
-	<div class="form-group">
-	  <input class="btn btn-default" type="button" onclick="generateSQL()" value="Generate Script"></input>
-	</div>
-	<div class="form-group">
-	  <label for="output">This script can be run on a system that has a production database to generate a clean initial database</label>
-	  <textarea readonly class="form-control" style="width: 100%" rows="10" id="output"></textarea>		  
-	</div>	
       </div>
     <div>
   </body>
