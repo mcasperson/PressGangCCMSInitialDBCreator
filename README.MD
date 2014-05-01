@@ -1,0 +1,1 @@
+This web app creates a script that will extract the structure and contents of an existing PressGang database in order to create a clean initial database for other distributions.
