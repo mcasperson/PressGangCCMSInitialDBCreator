@@ -69,7 +69,7 @@
             var propertyTagRE = /^propertyTag\./;
             var usersRE = /^user\./;
 
-            var username = "root";
+            var username = jQuery("#username").val();
             var password = jQuery("#password").val();
             var entities = jQuery("#entities").val().split("\n");
 
@@ -501,6 +501,10 @@
         <div class="container-fluid voffset3" ng-controller="QNAController">
             <div class="container step-container-main">
                 <form role="form">
+                    <div class="form-group">
+                        <label for="username">Enter the username that will be used to access the database</label>
+                        <input class="form-control" type="text" id="username" value="root"></input>
+                    </div>
                     <div class="form-group">
                         <label for="topics">Enter the root password for the database that the initial data will be extracted
                             from</label>
