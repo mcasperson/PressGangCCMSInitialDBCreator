@@ -73,6 +73,124 @@
             var password = jQuery("#password").val();
             var entities = jQuery("#entities").val().split("\n");
 
+            var tables = [
+                "REVINFO",
+                "BlobConstants",
+                "BlobConstants_AUD",
+                "BugzillaBug",
+                "BugzillaBug_AUD",
+                "CSNodeToCSNode",
+                "CSNodeToCSNode_AUD",
+                "CSNodeToPropertyTag",
+                "CSNodeToPropertyTag_AUD",
+                "Category",
+                "Category_AUD",
+                "ContentSpec",
+                "ContentSpecInfoNode",
+                "ContentSpecInfoNode_AUD",
+                "ContentSpecNode",
+                "ContentSpecNode_AUD",
+                "ContentSpecToProcess",
+                "ContentSpecToPropertyTag",
+                "ContentSpecToPropertyTag_AUD",
+                "ContentSpecToTag",
+                "ContentSpecToTag_AUD",
+                "ContentSpec_AUD",
+                "File",
+                "File_AUD",
+                "Filter",
+                "FilterCategory",
+                "FilterCategory_AUD",
+                "FilterField",
+                "FilterField_AUD",
+                "FilterLocale",
+                "FilterLocale_AUD",
+                "FilterOption",
+                "FilterOption_AUD",
+                "FilterTag",
+                "FilterTag_AUD",
+                "Filter_AUD",
+                "ImageFile",
+                "ImageFile_AUD",
+                "IntegerConstants",
+                "IntegerConstants_AUD",
+                "LanguageFile",
+                "LanguageFile_AUD",
+                "LanguageImage",
+                "LanguageImage_AUD",
+                "MinHash",
+                "MinHashXOR",
+                "MinHashXOR_AUD",
+                "MinHash_AUD",
+                "Process",
+                "Project",
+                "Project_AUD",
+                "PropertyTag",
+                "PropertyTagCategory",
+                "PropertyTagCategory_AUD",
+                "PropertyTagToPropertyTagCategory",
+                "PropertyTagToPropertyTagCategory_AUD",
+                "PropertyTag_AUD",
+                "RelationshipTag",
+                "RelationshipTag_AUD",
+                "Role",
+                "RoleToRole",
+                "RoleToRoleRelationship",
+                "RoleToRoleRelationship_AUD",
+                "RoleToRole_AUD",
+                "Role_AUD",
+                "StringConstants",
+                "StringConstants_AUD",
+                "Tag",
+                "TagExclusion",
+                "TagExclusion_AUD",
+                "TagToCategory",
+                "TagToCategory_AUD",
+                "TagToProject",
+                "TagToProject_AUD",
+                "TagToPropertyTag",
+                "TagToPropertyTag_AUD",
+                "TagToTag",
+                "TagToTagRelationship",
+                "TagToTagRelationship_AUD",
+                "TagToTag_AUD",
+                "Tag_AUD",
+                "Topic",
+                "TopicSecondOrderData",
+                "TopicSourceURL",
+                "TopicSourceURL_AUD",
+                "TopicToBugzillaBug",
+                "TopicToBugzillaBug_AUD",
+                "TopicToPropertyTag",
+                "TopicToPropertyTag_AUD",
+                "TopicToTag",
+                "TopicToTag_AUD",
+                "TopicToTopic",
+                "TopicToTopicSecondOrderData",
+                "TopicToTopicSourceURL",
+                "TopicToTopicSourceURL_AUD",
+                "TopicToTopic_AUD",
+                "Topic_AUD",
+                "TranslatedCSNode",
+                "TranslatedCSNodeString",
+                "TranslatedCSNodeString_AUD",
+                "TranslatedCSNode_AUD",
+                "TranslatedContentSpec",
+                "TranslatedContentSpec_AUD",
+                "TranslatedTopic",
+                "TranslatedTopicData",
+                "TranslatedTopicData_AUD",
+                "TranslatedTopicSecondOrderData",
+                "TranslatedTopicSecondOrderData_AUD",
+                "TranslatedTopicString",
+                "TranslatedTopicString_AUD",
+                "TranslatedTopic_AUD",
+                "User",
+                "UserRole",
+                "UserRole_AUD",
+                "User_AUD"
+            ];
+
             var output = "mysqldump -d -h localhost -u " + username + " -p" + password + " Skynet > /tmp/dumpfile.sql\n";
             output += "echo \"DROP DATABASE SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
             output += "echo \"CREATE SCHEMA SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
@@ -80,121 +198,10 @@
             output += "echo \"# PressGang initial database population\" > /tmp/create.sql\n";
 
             output += "echo \"# Reseting the auto increment values means we can insert new IDs below where the autoincrement value was originally set.\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE REVINFO AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE BlobConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE BlobConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE BugzillaBug AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE BugzillaBug_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE CSNodeToCSNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE CSNodeToCSNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE CSNodeToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE CSNodeToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Category AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Category_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpec AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecInfoNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecInfoNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecToProcess AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpecToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ContentSpec_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE File AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE File_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Filter AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterField AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterField_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterLocale AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterLocale_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterOption AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterOption_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE FilterTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Filter_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ImageFile AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE ImageFile_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE IntegerConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE IntegerConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE LanguageFile AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE LanguageFile_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE LanguageImage AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE LanguageImage_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE MinHash AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE MinHashXOR AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE MinHashXOR_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE MinHash_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Process AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Project AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Project_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTagCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTagCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTagToPropertyTagCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE PropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RelationshipTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RelationshipTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Role AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RoleToRole AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RoleToRoleRelationship AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RoleToRoleRelationship_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE RoleToRole_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Role_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE StringConstants AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE StringConstants_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Tag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagExclusion AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagExclusion_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToCategory AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToCategory_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToProject AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToProject_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToTagRelationship AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToTagRelationship_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TagToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Tag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Topic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicSourceURL AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicSourceURL_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToBugzillaBug AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToBugzillaBug_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToPropertyTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToPropertyTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTag AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTag_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTopic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTopicSourceURL AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTopicSourceURL_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TopicToTopic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE Topic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedCSNode AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedCSNodeString AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedCSNodeString_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedCSNode_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedContentSpec AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedContentSpec_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopic AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicData_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicSecondOrderData_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicString AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopicString_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE TranslatedTopic_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE User AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE UserRole AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE UserRole_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
-            output += "echo \"ALTER TABLE User_AUD AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+
+            jQuery.each(tables, function(index, element) {
+                output += "echo \"ALTER TABLE " + element + " AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
+            });
 
             output += "echo \"\" >> /tmp/create.sql\n";
             output += "echo \"# Create an initial revision\" >> /tmp/create.sql\n";
