@@ -199,7 +199,7 @@
 
             output += "echo \"# Reseting the auto increment values means we can insert new IDs below where the autoincrement value was originally set.\" >> /tmp/create.sql\n";
 
-            jQuery.each(tables, function(index, element) {
+            _.each(entities, function (element, index, list) {
                 output += "echo \"ALTER TABLE " + element + " AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
             });
 
