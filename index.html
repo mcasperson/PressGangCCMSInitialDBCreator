@@ -197,9 +197,9 @@
             output += "mysql -h localhost -u " + username + " -p" + password + " -DSkynetClean < /tmp/dumpfile.sql\n";
             output += "echo \"# PressGang initial database population\" > /tmp/create.sql\n";
 
-            output += "echo \"# Reseting the auto increment values means we can insert new IDs below where the autoincrement value was originally set.\" >> /tmp/create.sql\n";
+            output += "echo \"# Resetting the auto increment values means we can insert new IDs below where the autoincrement value was originally set.\" >> /tmp/create.sql\n";
 
-            _.each(entities, function (element, index, list) {
+            _.each(tables, function (element, index, list) {
                 output += "echo \"ALTER TABLE " + element + " AUTO_INCREMENT = 1;\" >> /tmp/create.sql\n";
             });
 
@@ -319,7 +319,7 @@
             }
 
             // Add some content spec
-            var specsText = Query("#specs").val().trim();
+            var specsText = jQuery("#specs").val().trim();
             if (specsText.length !== 0) {
                 var specs = jQuery("#specs").val().split(",");
                 _.each(specs, function (element, index, list) {
@@ -483,6 +483,11 @@
             output += "mysqldump -h localhost -u " + username + " -p" + password + " SkynetClean > /tmp/initialdb.sql\n";
 
             jQuery("#output").val(output);
+
+            jQuery("#download").removeAttr('disabled');
+            jQuery('#download').off().on('click', function() {
+                window.open("data:application/octet-stream," + encodeURIComponent(output));
+            });
         }
         </script>
     </head>
@@ -522,6 +527,9 @@
                         <label for="output">This script can be run on a system that has a production database to generate a
                             clean initial database</label>
                         <textarea readonly class="form-control" style="width: 100%" rows="10" id="output"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input disabled id="download" class="btn btn-default" type="button" value="Download Script"></input>
                     </div>
                 </form>
             </div>
