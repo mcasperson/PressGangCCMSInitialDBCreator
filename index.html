@@ -69,6 +69,13 @@
             var propertyTagRE = /^propertyTag\./;
             var usersRE = /^user\./;
 
+            var tagsProcessed = [];
+            var categoriesProcessed = [];
+            var blobsProcessed = [];
+            var stringsProcessed = [];
+            var propertyTagsProcessed = [];
+            var usersProcessed = [];
+
             var username = jQuery("#username").val();
             var password = jQuery("#password").val();
             var entities = jQuery("#entities").val().split("\n");
@@ -230,7 +237,9 @@
             _.each(entities, function (element, index, list) {
                 var keyValue = element.split(/\s*=\s*/);
 
-                if (tagRE.test(element)) {
+                if (tagRE.test(element) && tagsProcessed.indexOf(keyValue[1]) === -1) {
+                    tagsProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.Tag\" >> /tmp/create.sql\n";
                     output += "echo \"(TagID, TagName, TagDescription)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT TagID, TagName, TagDescription FROM Skynet.Tag WHERE TagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
@@ -240,7 +249,9 @@
                     output += "echo \"(SELECT TagID, 1, null, 0, TagName, TagDescription FROM Skynet.Tag WHERE TagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
 
                     output += "echo \"\" >> /tmp/create.sql\n";
-                } else if (categoryRE.test(element)) {
+                } else if (categoryRE.test(element) && categoriesProcessed.indexOf(keyValue[1]) === -1) {
+                    categoriesProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.Category\" >> /tmp/create.sql\n";
                     output += "echo \"(CategoryID, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT CategoryID, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive FROM Skynet.Category WHERE CategoryID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
@@ -250,7 +261,9 @@
                     output += "echo \"(SELECT CategoryID,1,null,0,CategoryDescription,CategoryName,CategorySort,MutuallyExclusive FROM SkynetClean.Category WHERE CategoryID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
 
                     output += "echo \"\" >> /tmp/create.sql\n";
-                } else if (blobRE.test(element)) {
+                } else if (blobRE.test(element) && blobsProcessed.indexOf(keyValue[1]) === -1) {
+                    blobsProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.BlobConstants\" >> /tmp/create.sql\n";
                     output += "echo \"(BlobConstantsID,ConstantName,ConstantValue)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT BlobConstantsID,ConstantName,ConstantValue FROM Skynet.BlobConstants WHERE BlobConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
@@ -260,7 +273,9 @@
                     output += "echo \"(SELECT BlobConstantsID,1,null,0,ConstantName,ConstantValue FROM Skynet.BlobConstants WHERE BlobConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
 
                     output += "echo \"\" >> /tmp/create.sql\n";
-                } else if (stringRE.test(element)) {
+                } else if (stringRE.test(element) && stringsProcessed.indexOf(keyValue[1]) === -1) {
+                    stringsProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.StringConstants\" >> /tmp/create.sql\n";
                     output += "echo \"(StringConstantsID,ConstantName,ConstantValue)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT StringConstantsID,ConstantName,ConstantValue FROM Skynet.StringConstants WHERE StringConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
@@ -270,7 +285,9 @@
                     output += "echo \"(SELECT StringConstantsID,1,null,0,ConstantName,ConstantValue FROM Skynet.StringConstants WHERE StringConstantsID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
 
                     output += "echo \"\" >> /tmp/create.sql\n";
-                } else if (propertyTagRE.test(element)) {
+                } else if (propertyTagRE.test(element) && propertyTagsProcessed.indexOf(keyValue[1]) === -1) {
+                    propertyTagsProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.PropertyTag\" >> /tmp/create.sql\n";
                     output += "echo \"(PropertyTagID,PropertyTagName,PropertyTagDescription,PropertyTagRegex,PropertyTagCanBeNull,PropertyTagIsUnique)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT PropertyTagID,PropertyTagName,PropertyTagDescription,PropertyTagRegex,PropertyTagCanBeNull,PropertyTagIsUnique FROM Skynet.PropertyTag WHERE PropertyTagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
@@ -280,7 +297,9 @@
                     output += "echo \"(SELECT PropertyTagID,1,null,0,PropertyTagCanBeNull,PropertyTagDescription,PropertyTagName,PropertyTagRegex,PropertyTagIsUnique FROM Skynet.PropertyTag WHERE PropertyTagID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
 
                     output += "echo \"\" >> /tmp/create.sql\n";
-                } else if (usersRE.test(element)) {
+                } else if (usersRE.test(element) && usersProcessed.indexOf(keyValue[1]) === -1) {
+                    usersProcessed.push(keyValue[1]);
+
                     output += "echo \"INSERT INTO SkynetClean.User\" >> /tmp/create.sql\n";
                     output += "echo \"(UserID,UserName,Description)\" >> /tmp/create.sql\n";
                     output += "echo \"(SELECT UserID,UserName,Description FROM Skynet.User WHERE UserID = " + keyValue[1] + ");\" >> /tmp/create.sql\n";
