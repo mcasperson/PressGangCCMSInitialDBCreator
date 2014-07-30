@@ -217,7 +217,9 @@
                 "User_AUD"
             ];
 
-            var output = "mysqldump -d -h localhost -u " + username + " -p" + password + " Skynet > /tmp/dumpfile.sql\n";
+            var output = "#Dump the existing schema without any data. This is the skeleton that we will repopulate.\n";
+            output += "mysqldump -d -h localhost -u " + username + " -p" + password + " Skynet > /tmp/dumpfile.sql\n";
+            output += "#Delete and recreate the clean schema.\n";
             output += "echo \"DROP DATABASE SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
             output += "echo \"CREATE SCHEMA SkynetClean;\" | mysql -h localhost -u " + username + " -p" + password + "\n";
             output += "mysql -h localhost -u " + username + " -p" + password + " -DSkynetClean < /tmp/dumpfile.sql\n";
